@@ -1,0 +1,212 @@
+---
+title: "Travel time calculations"
+output: html_notebook
+---
+
+In this notebook we calculate travel times between DA centroids and clinics. The source of the clinic data is...ASK EVA BOONSMA...and the centroids are...ALSO ASK.
+
+I used [BBBike](https://download.bbbike.org/osm/bbbike/) to extract OSM data for Hamilton on April 16, 2024. The name of the file is `Toronto.osm.pbf`. I copied this file to folder `data-raw/r5_graph`.
+
+IMPORTANT: allocate memory before loading {r5r}. The memory needs to be consistent with the system where this is run. In AP's laptop this is set to 20 Gigabytes
+```{r}
+# Allocate memory for routing
+options(java.parameters = "-Xmx20G")
+```
+
+Load packages:
+```{r}
+library(disk.frame) # Larger-than-RAM Disk-Based Data Manipulation Framework
+library(dplyr) # A Grammar of Data Manipulation
+library(ggforce) # Accelerating 'ggplot2'
+library(ggplot2) # Create Elegant Data Visualisations Using the Grammar of Graphics
+library(glue) # Interpreted String Literals
+library(here) # not installed on this machine
+library(purrr) # Functional Programming Tools
+library(r5r) # Rapid Realistic Routing with 'R5'
+library(readr) # Read Rectangular Text Data
+library(sf) # Simple Features for R
+library(skimr) # Compact and Flexible Summaries of Data
+library(stringr) # Simple, Consistent Wrappers for Common String Operations
+library(units) # Measurement Units for R Vectors
+```
+
+Note that {r5r} requires the Java SE Development Kit 21. See:
+
+https://www.oracle.com/java/technologies/downloads/#java21
+
+Set the environmental variable to use Java: https://confluence.atlassian.com/doc/setting-the-java_home-variable-in-windows-8895.html
+
+## Read data
+
+There are two data files with locational information, centroids of DAs and location of clinics. Read the files:
+```{r}
+clinics <- read_csv("clinics.csv")
+das <- read_csv("centroids.txt")
+```
+
+Convert to simple features:
+```{r}
+das <- das |>
+  st_as_sf(coords = c("X", 
+                      "Y"), crs = 32617) |>
+  st_transform(crs = 4326)
+
+clinics <- clinics |>
+  # Convert to simple features
+  st_as_sf(coords = c("Longitude", 
+                      "Latitude"), crs = 4326) |>
+  # Make an id for the clinics
+  mutate(id = 1:n(),
+         id = as.character(id),
+         id = case_when(str_length(id) == 1 ~ paste0("C0", id),
+                        TRUE ~ as.character(id))) |>
+  # Rename the columns
+  rename(Clinic_Name = `Clinic Nam`,
+         Location = `Clinic Loc`) |>
+  # Reorganize the columns in the table
+  select(id, everything())
+```
+
+## Network routing
+
+Set Up R5 Routing. First define the path to where the graph is located:
+```{r set up r5 path, include=FALSE}
+r5_path <- file.path("./r5_graph")
+```
+
+This is an example of downloading GTFS (general transit feed specification) for Hamilton, needs to be changed for Toronto if desired (NOT RUN):
+```{r eval=FALSE}
+# download.file(url = "https://transitfeeds.com/p/hamilton-street-railway/31/latest/download", 
+#               destfile = file.path(r5_path, 
+#                                    "HSR_transit.zip"), 
+#               mode = "wb")
+```
+
+Build the graph:
+```{r build-graph, include = FALSE}
+r5_toronto <- setup_r5(data_path = r5_path, 
+                       verbose = FALSE)
+```
+
+Retrieve network as a simple features object:
+```{r eval=FALSE}
+toronto_net <- street_network_to_sf(r5_toronto)
+```
+
+Save network as sf:
+```{r eval=FALSE}
+save(toronto_net, file = "hamilton_net.rda", compress = "xz")
+```
+
+Prepare Input Data for `r5r` to calculate travel times between DA centroids and clinics. 
+
+The origins are the coordinates of the DAs and the destinations the coordinates of the clinics:
+```{r prepare-inputs}
+# save origins in format expected by R5R (id, lon, lat)
+origins_i_da <- data.frame(id = das$DAUID, 
+                           das |>
+                             st_transform(crs = 4326) |>
+                             st_coordinates()) |>
+  rename(lon = X, lat = Y) |>
+  dplyr::select(id, lon, lat)
+
+# now destinations sites
+destinations_j_clinics <- data.frame(id = clinics$id, 
+                                     clinics |>
+                                       st_transform(crs = 4326) |>
+                                       st_coordinates()) |>
+  rename(lon = X, lat = Y) |>
+  dplyr::select(id, lon, lat)
+```
+
+Calculate OD Matrix for driving (from DAs to clinics):
+```{r calculate drive od matrix DAs}
+
+# set up batching according to how many origin rows to process at one time
+chunksize = 4000 # larger chunks for walking will give enough origins in each chunk to allow multiprocessing to spin up with R5R
+num_chunks = ceiling(nrow(origins_i_da)/chunksize)
+
+# create origin-destination pairs
+origins_chunks <- as.disk.frame(origins_i_da,
+                                outdir = "./df/origins_i_da",
+                                nchunks = num_chunks,
+                                overwrite = TRUE)
+
+start.time <- Sys.time()
+pb <- txtProgressBar(0, num_chunks, style = 3)
+
+for (i in 1:num_chunks){ 
+  origins_i_chunk <- get_chunk(origins_chunks, i)
+  ttm_chunk <- travel_time_matrix(r5_toronto,
+                                  origins = origins_i_chunk,
+                                  destinations = destinations_j_clinics,
+                                  mode = c("CAR"),
+                                  departure_datetime = as.POSIXct(strptime("2024-04-16 08:00:00", "%Y-%m-%d %H:%M:%S")),
+                                  max_walk_time = 15, # minutes
+                                  max_trip_duration = 150)
+  
+  # export output as disk.frame
+  ifelse(i == 1, output_df <- as.disk.frame(ttm_chunk,
+                                            nchunks = 1,
+                                            outdir = "./df/output_ttm_drive",
+                                            compress = 50,
+                                            overwrite = TRUE),
+         add_chunk(output_df, ttm_chunk, chunk_id = i))
+  setTxtProgressBar(pb, i)
+}
+
+end.time <- Sys.time()
+time.taken <- end.time - start.time
+time.taken
+```
+
+Time taken:
+```{r}
+time.taken
+```
+
+
+## Extract travel time matrices
+
+For DAs:
+```{r load od matrix for walk DAs, include=FALSE}
+# connect to the walking travel time matrix disk frame
+ttm_drive.disk.frame <- disk.frame("./df/output_ttm_drive")
+#opportunities_j <- as.data.frame(nyc_cb_point) |> select(GEOID10, total_emp) |> rename(toId = GEOID10, o_j = total_emp)
+```
+
+Convert disk.frame to data frame:
+```{r}
+ttm_drive_da <- as.data.frame(ttm_drive.disk.frame) |>
+  transmute(DAUID = from_id, id = to_id, travel_time = travel_time_p50)
+```
+
+Summary of travel time table:
+```{r}
+summary(ttm_drive_da)
+```
+
+Save data objects:
+```{r eval=FALSE}
+# DA centroids
+da_centroids <- das
+
+da_centroids <- da_centroids |>
+  st_transform(crs = 4326)
+
+save(da_centroids,
+     file = glue(here::here(), 
+                 "/data/da_centroids.rda"), 
+     compress = "xz")
+
+# Clinics
+save(clinics,
+     file = glue(here::here(), 
+                 "/data/clinics.rda"), 
+     compress = "xz")
+
+# Travel time matrix
+save(ttm_drive_da, file = glue(here::here(), "/data/ttm_drive_da.rda"), compress = "xz")
+```
+
+
