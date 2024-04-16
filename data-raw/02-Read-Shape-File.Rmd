@@ -1,0 +1,30 @@
+---
+title: "Read shapefile with demographic information"
+output: html_notebook
+---
+
+In this notebook we read the shape file with the DAs. This is used for mapping and additional spatial analysis.
+
+Load the packages:
+```{r}
+library(ggplot2) # Create Elegant Data Visualisations Using the Grammar of Graphics
+library(glue) # Interpreted String Literals
+library(here) # A Simpler Way to Find Your Files
+library(sf) # Simple Features for R
+```
+
+Read shape file with Toronto's DAs:
+```{r}
+toronto_das <- st_read("shp/TorontoDAs.shp") |>
+  st_transform(crs = 4326)
+```
+
+Save the data object:
+```{r}
+save(toronto_das,
+     file = glue(here::here(), 
+                 "/data/toronto_das.rda"), 
+     compress = "xz")
+```
+
+

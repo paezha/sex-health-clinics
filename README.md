@@ -41,6 +41,8 @@ The following data objects are available:
 - `data/clinics.rda`: a simple features table with the location of the
   clinics.  
 - `data/da_centroids.rda`: a simple features table with the centroids of
-  the DAs in Toronto.
+  the Dissemination Areas (DAs) in Toronto.
+- `data/ttm_driva_da.rda`: a simple features table with Toronto’s
+  Dissemination Areas (DAs).  
 - `data/ttm_driva_da.rda`: a data frame with driving times from DA
   centroid to clinic. The travel time is in minutes.

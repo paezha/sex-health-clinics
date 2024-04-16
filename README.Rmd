@@ -38,15 +38,19 @@ The notebook with the routing is in folder `data-raw\01-OSM-Network-and-Routing`
 The following data objects are available:
 
 - `data/clinics.rda`: a simple features table with the location of the clinics.  
-- `data/da_centroids.rda`: a simple features table with the centroids of the DAs in Toronto.
+- `data/da_centroids.rda`: a simple features table with the centroids of the Dissemination Areas (DAs) in Toronto.
+- `data/ttm_driva_da.rda`: a simple features table with Toronto's Dissemination Areas (DAs).  
 - `data/ttm_driva_da.rda`: a data frame with driving times from DA centroid to clinic. The travel time is in minutes.
 
 ```{r load-packages, include = FALSE}
 library(dplyr) # A Grammar of Data Manipulation
+library(ggplot2) # Create Elegant Data Visualisations Using the Grammar of Graphics
+library(sf) # Simple Features for R
 ```
 
 ```{r load-data, include=FALSE}
 load("data/ttm_drive_da.rda")
+load("data/toronto_das.rda")
 ```
 
 ```{r calculate-impedance, include=FALSE}
@@ -71,4 +75,25 @@ acc_sex <- ttm_drive_da |>
 ```{r summary-accessibility, include=FALSE}
 summary(acc_sex)
 ```
+
+```{r join-accessibility-to-DAs, include=FALSE}
+toronto_das <- toronto_das |>
+  left_join(acc_sex,
+            by = "DAUID")
+```
+
+```{r plot-accessibility, include=FALSE}
+ggplot() +
+  geom_sf(data = toronto_das,
+          aes(fill = acc_sex),
+          color = NA) +
+  scale_fill_distiller(name = "Accessibility",
+                       palette = "Reds", 
+                       direction = 1,
+                       na.value = "white") +
+  labs(subtitle = "Accessibility to sex health clinics by DA") +
+  theme_minimal()
+```
+
+
 
