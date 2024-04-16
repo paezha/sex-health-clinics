@@ -5,7 +5,7 @@ output: html_notebook
 
 In this notebook we calculate travel times between DA centroids and clinics. The source of the clinic data is...ASK EVA BOONSMA...and the centroids are...ALSO ASK.
 
-I used [BBBike](https://download.bbbike.org/osm/bbbike/) to extract OSM data for Hamilton on April 16, 2024. The name of the file is `Toronto.osm.pbf`. I copied this file to folder `data-raw/r5_graph`.
+I used [BBBike](https://download.bbbike.org/osm/bbbike/Toronto) to extract OSM data for Hamilton on April 16, 2024. The name of the file is `Toronto.osm.pbf`. I copied this file to folder `data-raw/r5_graph`. This file is not shared on GitHub, so you need to get your own and save it in there if you wish to replicate the routing calculations.
 
 IMPORTANT: allocate memory before loading {r5r}. The memory needs to be consistent with the system where this is run. In AP's laptop this is set to 20 Gigabytes
 ```{r}

@@ -1,0 +1,74 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Sex health clinics in Toronto
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+This repository holds information about sex health clinics in Toronto. It supports a student project for ENVSOCTY 4GA3 (Applied Spatial Statistics) by:
+
+- Victoria Baginski  
+- Eva Boomsma  
+- Peri Juskiw
+- Samantha Kirtz  
+- Chantelle Lobo  
+- Helena Muirhead-Hunt  
+- Eva Novoselac  
+- Audreana Rossi  
+
+The students have collected information about clinics in Toronto, and have the Dissemination Areas (DAs). They shared the DA centroids and the location of the clinics.
+
+I obtained the road network in Toronto from [BBBike](https://download.bbbike.org/osm/bbbike/Toronto), and use {[r5r](https://ipeagit.github.io/r5r/index.html)} to calculate driving times from DA centroids to each clinic. 
+
+The file with the road network is not shared on GitHub (it is a large file), so if you wish to replicate the routing calculations you need to obtain a copy and place in folder `data-raw/r5_graph/`. The file must be in `osm.pbf` format, which is what {r5r} uses.
+
+The notebook with the routing is in folder `data-raw\01-OSM-Network-and-Routing`. You can check it for details.
+
+The following data objects are available:
+
+- `data/clinics.rda`: a simple features table with the location of the clinics.  
+- `data/da_centroids.rda`: a simple features table with the centroids of the DAs in Toronto.
+- `data/ttm_driva_da.rda`: a data frame with driving times from DA centroid to clinic. The travel time is in minutes.
+
+```{r load-packages, include = FALSE}
+library(dplyr) # A Grammar of Data Manipulation
+```
+
+```{r load-data, include=FALSE}
+load("data/ttm_drive_da.rda")
+```
+
+```{r calculate-impedance, include=FALSE}
+# Calculate impedance; use the formula used by Paez, Higgins, and Vivona (2019). Check equation in page 27.
+ttm_drive_da <- ttm_drive_da |>
+  mutate(f_tt = case_when(travel_time <= 5 ~ 0.946,
+                           travel_time > 5 & travel_time <= 10 ~ 0.801,
+                           travel_time > 10 & travel_time <= 15 ~ 0.607,
+                           travel_time > 15 & travel_time <= 20 ~ 0.411,
+                           travel_time > 20 & travel_time <= 30 ~ 0.135,
+                           travel_time > 30 & travel_time <= 45 ~ 0.011,
+                           travel_time > 45 ~ 0.000))
+```
+
+```{r calculate-accessibility, include=FALSE}
+acc_sex <- ttm_drive_da |>
+  group_by(DAUID) |>
+  summarize(acc_sex = sum(f_tt),
+            .groups = "drop")
+```
+
+```{r summary-accessibility, include=FALSE}
+summary(acc_sex)
+```
+
