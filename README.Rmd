@@ -4,7 +4,7 @@ output: github_document
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-```{r, include = FALSE}
+```{r, include = TRUE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
@@ -27,7 +27,7 @@ This repository holds information about sex health clinics in Toronto. It suppor
 - Eva Novoselac  
 - Audreana Rossi  
 
-The students have collected information about clinics in Toronto, and have the Dissemination Areas (DAs). They shared the DA centroids and the location of the clinics.
+The students have collected information about clinics in Toronto, and have the Dissemination Areas (DAs). They shared the DA centroids and the location of the clinics. Additional information includes population by various age groups. It would be nice to have income and other demographic variables.
 
 I obtained the road network in Toronto from [BBBike](https://download.bbbike.org/osm/bbbike/Toronto), and use {[r5r](https://ipeagit.github.io/r5r/index.html)} to calculate driving times from DA centroids to each clinic. 
 
@@ -42,7 +42,10 @@ The following data objects are available:
 - `data/ttm_driva_da.rda`: a simple features table with Toronto's Dissemination Areas (DAs) and population statistics by various age groups.  
 - `data/ttm_driva_da.rda`: a data frame with driving times from DA centroid to clinic. The travel time is in minutes.
 
-```{r load-packages, include = FALSE}
+## Calculate accessibility and availability
+
+Load packages:
+```{r load-packages, include = TRUE}
 library(accessibility) # Transport Accessibility Measures
 library(dplyr) # A Grammar of Data Manipulation
 library(ggplot2) # Create Elegant Data Visualisations Using the Grammar of Graphics
@@ -50,13 +53,15 @@ library(sf) # Simple Features for R
 library(tidyr) # Tidy Messy Data
 ```
 
-```{r load-data, include=FALSE}
+Load data:
+```{r load-data, include = TRUE}
 load("data/clinics.rda")
 load("data/ttm_drive_da.rda")
 load("data/toronto_das.rda")
 ```
 
-```{r calculate-impedance, include=FALSE}
+Calculate the impedance, using a step-wise function:
+```{r calculate-impedance, include = TRUE}
 # Calculate impedance; use the formula used by Paez, Higgins, and Vivona (2019). Check equation in page 27.
 ttm_drive_da <- ttm_drive_da |>
   mutate(f_tt = case_when(travel_time <= 5 ~ 0.946,
@@ -68,24 +73,28 @@ ttm_drive_da <- ttm_drive_da |>
                           travel_time > 45 ~ 0.000))
 ```
 
-```{r calculate-accessibility, include=FALSE}
+The accessibility is the weighted sum of the clinics, with the weights given by the impedance:
+```{r calculate-accessibility, include = TRUE}
 acc_sex <- ttm_drive_da |>
   group_by(DAUID) |>
   summarize(S = sum(f_tt),
             .groups = "drop")
 ```
 
-```{r summary-accessibility, include=FALSE}
+Summary of the accessibility:
+```{r summary-accessibility, include = TRUE}
 summary(acc_sex)
 ```
 
-```{r join-accessibility-to-DAs, include=FALSE}
+Join the accessibility to the DAs:
+```{r join-accessibility-to-DAs, include = TRUE}
 toronto_das <- toronto_das |>
   left_join(acc_sex,
             by = "DAUID")
 ```
 
-```{r plot-accessibility, include=FALSE}
+Plot the accessibility:
+```{r plot-accessibility, include = TRUE}
 ggplot() +
   geom_sf(data = toronto_das,
           aes(fill = S),
@@ -98,7 +107,8 @@ ggplot() +
   theme_minimal()
 ```
 
-```{r prepare-table-for-spatial-availability, include=FALSE}
+Prepare a table with the population and clinics to use as a land use table in package {accessibility}:
+```{r prepare-table-for-spatial-availability, include = TRUE}
 # Prepare land use table
 # Population
 pop <- toronto_das |>
@@ -118,7 +128,8 @@ opps <- clinics |>
 lu <- rbind(pop, opps)
 ```
 
-```{r calculate-detailed-spatial-availability, include=FALSE}
+Calculate the spatial availability of clinics (detailed table is the portion of clinic allocated to each DA):
+```{r calculate-detailed-spatial-availability, include = TRUE}
 detailed_V <- spatial_availability(
   ttm_drive_da |>
     transmute(from_id = DAUID, 
@@ -135,7 +146,8 @@ detailed_V <- spatial_availability(
 )
 ```
 
-```{r calculate-spatial-availability, include=FALSE}
+Calculate the total spatial availability by DA (the sum of all portions of clinics allocated to each DA):
+```{r calculate-spatial-availability, include = TRUE}
 V <- detailed_V |>
   group_by(from_id) |>
   summarize(V = sum(clinics),
@@ -143,13 +155,21 @@ V <- detailed_V |>
   rename(DAUID = from_id)
 ```
 
-```{r join-spatial-availability-to-DAs, include=FALSE}
+Join spatial availability to DAs:
+```{r join-spatial-availability-to-DAs, include = TRUE}
 toronto_das <- toronto_das |>
   left_join(V,
             by = "DAUID")
 ```
 
-```{r compare-accessibility-and-availability, include=FALSE}
+Calculate the availability per capita $v_i$, this is the availability divided by the population serviced in the DA:
+```{r calculate-availability-per-capita, include = TRUE}
+toronto_das <- toronto_das |>
+            mutate(v = V/Pop15plus)
+```
+
+Compare the accessibility and availability:
+```{r compare-accessibility-and-availability, include = TRUE}
 S_plot <- ggplot() +
   geom_sf(data = toronto_das,
           aes(fill = S),
@@ -174,5 +194,37 @@ V_plot <- ggplot() +
 
 S_plot
 V_plot
+```
+
+Plot the availability per capita:
+```{r plot-availability-per-capita, include = TRUE} 
+ggplot() +
+  geom_sf(data = toronto_das,
+          aes(fill = v),
+          color = NA) +
+  scale_fill_distiller(name = "Availability per capita",
+                       palette = "Reds", 
+                       direction = 1,
+                       na.value = "white") +
+  labs(subtitle = "Availability per capita to sex health clinics by DA") +
+  theme_minimal()
+```
+
+Plot the deviations of the availability per capita relative to the equality line (the number of clinics divided by the total population serviced):
+```{r equity-plot, include = TRUE}
+# Equal proportion is clinics divided by population
+ep <- 15/sum(toronto_das$Pop15plus, na.rm = TRUE)
+
+# Plot deviations from equal distribution
+ggplot() +
+  geom_sf(data = toronto_das,
+          aes(fill = v - ep),
+          color = NA) +
+  scale_fill_gradient2(name = "Availability per capita",
+                       #palette = "Reds", 
+                       #direction = 1,
+                       na.value = "white") +
+  labs(subtitle = "Availability per capita to sex health clinics by DA") +
+  theme_minimal()
 ```
 
