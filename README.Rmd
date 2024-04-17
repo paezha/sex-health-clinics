@@ -39,16 +39,19 @@ The following data objects are available:
 
 - `data/clinics.rda`: a simple features table with the location of the clinics.  
 - `data/da_centroids.rda`: a simple features table with the centroids of the Dissemination Areas (DAs) in Toronto.
-- `data/ttm_driva_da.rda`: a simple features table with Toronto's Dissemination Areas (DAs).  
+- `data/ttm_driva_da.rda`: a simple features table with Toronto's Dissemination Areas (DAs) and population statistics by various age groups.  
 - `data/ttm_driva_da.rda`: a data frame with driving times from DA centroid to clinic. The travel time is in minutes.
 
 ```{r load-packages, include = FALSE}
+library(accessibility) # Transport Accessibility Measures
 library(dplyr) # A Grammar of Data Manipulation
 library(ggplot2) # Create Elegant Data Visualisations Using the Grammar of Graphics
 library(sf) # Simple Features for R
+library(tidyr) # Tidy Messy Data
 ```
 
 ```{r load-data, include=FALSE}
+load("data/clinics.rda")
 load("data/ttm_drive_da.rda")
 load("data/toronto_das.rda")
 ```
@@ -57,18 +60,18 @@ load("data/toronto_das.rda")
 # Calculate impedance; use the formula used by Paez, Higgins, and Vivona (2019). Check equation in page 27.
 ttm_drive_da <- ttm_drive_da |>
   mutate(f_tt = case_when(travel_time <= 5 ~ 0.946,
-                           travel_time > 5 & travel_time <= 10 ~ 0.801,
-                           travel_time > 10 & travel_time <= 15 ~ 0.607,
-                           travel_time > 15 & travel_time <= 20 ~ 0.411,
-                           travel_time > 20 & travel_time <= 30 ~ 0.135,
-                           travel_time > 30 & travel_time <= 45 ~ 0.011,
-                           travel_time > 45 ~ 0.000))
+                          travel_time > 5 & travel_time <= 10 ~ 0.801,
+                          travel_time > 10 & travel_time <= 15 ~ 0.607,
+                          travel_time > 15 & travel_time <= 20 ~ 0.411,
+                          travel_time > 20 & travel_time <= 30 ~ 0.135,
+                          travel_time > 30 & travel_time <= 45 ~ 0.011,
+                          travel_time > 45 ~ 0.000))
 ```
 
 ```{r calculate-accessibility, include=FALSE}
 acc_sex <- ttm_drive_da |>
   group_by(DAUID) |>
-  summarize(acc_sex = sum(f_tt),
+  summarize(S = sum(f_tt),
             .groups = "drop")
 ```
 
@@ -85,7 +88,7 @@ toronto_das <- toronto_das |>
 ```{r plot-accessibility, include=FALSE}
 ggplot() +
   geom_sf(data = toronto_das,
-          aes(fill = acc_sex),
+          aes(fill = S),
           color = NA) +
   scale_fill_distiller(name = "Accessibility",
                        palette = "Reds", 
@@ -95,5 +98,81 @@ ggplot() +
   theme_minimal()
 ```
 
+```{r prepare-table-for-spatial-availability, include=FALSE}
+# Prepare land use table
+# Population
+pop <- toronto_das |>
+  st_drop_geometry() |>
+  transmute(id = DAUID, 
+            population = Pop15plus,
+            clinics = 0)
 
+# Clinics
+opps <- clinics |>
+  st_drop_geometry() |>
+  transmute(id = id, 
+            population = 0,
+            clinics = 1)
+
+# Bind into a single "land use" table
+lu <- rbind(pop, opps)
+```
+
+```{r calculate-detailed-spatial-availability, include=FALSE}
+detailed_V <- spatial_availability(
+  ttm_drive_da |>
+    transmute(from_id = DAUID, 
+              to_id = id,
+              travel_time),
+  lu |>
+    mutate(population = replace_na(population, 0)),
+  opportunity = "clinics",
+  travel_cost = "travel_time",
+  demand = "population",
+  decay_function = decay_stepped(c(5, 10, 15, 20, 30, 45),
+                                 weights = c(0.801, 0.607, 0.411, 0.135, 0.011, 0)),
+  detailed_results = TRUE
+)
+```
+
+```{r calculate-spatial-availability, include=FALSE}
+V <- detailed_V |>
+  group_by(from_id) |>
+  summarize(V = sum(clinics),
+            .groups = "drop") |>
+  rename(DAUID = from_id)
+```
+
+```{r join-spatial-availability-to-DAs, include=FALSE}
+toronto_das <- toronto_das |>
+  left_join(V,
+            by = "DAUID")
+```
+
+```{r compare-accessibility-and-availability, include=FALSE}
+S_plot <- ggplot() +
+  geom_sf(data = toronto_das,
+          aes(fill = S),
+          color = NA) +
+  scale_fill_distiller(name = "Accessibility",
+                       palette = "Reds", 
+                       direction = 1,
+                       na.value = "white") +
+  labs(subtitle = "Accessibility to sex health clinics by DA") +
+  theme_minimal()
+
+V_plot <- ggplot() +
+  geom_sf(data = toronto_das,
+          aes(fill = V),
+          color = NA) +
+  scale_fill_distiller(name = "Availability",
+                       palette = "Reds", 
+                       direction = 1,
+                       na.value = "white") +
+  labs(subtitle = "Availability of sex health clinics by DA") +
+  theme_minimal()
+
+S_plot
+V_plot
+```
 

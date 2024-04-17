@@ -7,9 +7,11 @@ In this notebook we read the shape file with the DAs. This is used for mapping a
 
 Load the packages:
 ```{r}
+library(dplyr) # A Grammar of Data Manipulation
 library(ggplot2) # Create Elegant Data Visualisations Using the Grammar of Graphics
 library(glue) # Interpreted String Literals
-library(here) # A Simpler Way to Find Your Files
+library(here) # not installed on this machine
+library(readr) # Read Rectangular Text Data
 library(sf) # Simple Features for R
 ```
 
@@ -19,6 +21,27 @@ toronto_das <- st_read("shp/TorontoDAs.shp") |>
   st_transform(crs = 4326)
 ```
 
+Also read the population data:
+```{r}
+toronto_pop <- read_csv("toronto_pop.csv")
+```
+
+Prepare columns to join with simple features:
+```{r}
+toronto_pop <- toronto_pop |>
+              mutate(DAUID = as.character(DAUID)) |>
+  rename(Pop_15_to_64 = `Population 15 to 64`)
+
+```
+
+
+Join population data to simple features table:
+```{r}
+toronto_das <- toronto_das |>
+  left_join(toronto_pop,
+            by = "DAUID")
+```
+
 Save the data object:
 ```{r}
 save(toronto_das,
@@ -26,5 +49,4 @@ save(toronto_das,
                  "/data/toronto_das.rda"), 
      compress = "xz")
 ```
-
 

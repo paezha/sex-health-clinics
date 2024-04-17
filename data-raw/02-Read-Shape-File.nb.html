@@ -1758,12 +1758,36 @@ for mapping and additional spatial analysis.</p>
 <p>Load the packages:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShnZ3Bsb3QyKSAjIENyZWF0ZSBFbGVnYW50IERhdGEgVmlzdWFsaXNhdGlvbnMgVXNpbmcgdGhlIEdyYW1tYXIgb2YgR3JhcGhpY3NcbmxpYnJhcnkoZ2x1ZSkgIyBJbnRlcnByZXRlZCBTdHJpbmcgTGl0ZXJhbHNcbmxpYnJhcnkoaGVyZSkgIyBBIFNpbXBsZXIgV2F5IHRvIEZpbmQgWW91ciBGaWxlc1xubGlicmFyeShzZikgIyBTaW1wbGUgRmVhdHVyZXMgZm9yIFJcbmBgYCJ9 -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShkcGx5cikgIyBBIEdyYW1tYXIgb2YgRGF0YSBNYW5pcHVsYXRpb25cbmBgYCJ9 -->
+<pre class="r"><code>library(dplyr) # A Grammar of Data Manipulation</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5BdHRhY2hpbmcgcGFja2FnZTog4oCYZHBseXLigJlcblxuVGhlIGZvbGxvd2luZyBvYmplY3RzIGFyZSBtYXNrZWQgZnJvbSDigJhwYWNrYWdlOnN0YXRz4oCZOlxuXG4gICAgZmlsdGVyLCBsYWdcblxuVGhlIGZvbGxvd2luZyBvYmplY3RzIGFyZSBtYXNrZWQgZnJvbSDigJhwYWNrYWdlOmJhc2XigJk6XG5cbiAgICBpbnRlcnNlY3QsIHNldGRpZmYsIHNldGVxdWFsLCB1bmlvblxuIn0= -->
+<pre><code>
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShnZ3Bsb3QyKSAjIENyZWF0ZSBFbGVnYW50IERhdGEgVmlzdWFsaXNhdGlvbnMgVXNpbmcgdGhlIEdyYW1tYXIgb2YgR3JhcGhpY3NcbmxpYnJhcnkoZ2x1ZSkgIyBJbnRlcnByZXRlZCBTdHJpbmcgTGl0ZXJhbHNcbmxpYnJhcnkoaGVyZSkgIyBub3QgaW5zdGFsbGVkIG9uIHRoaXMgbWFjaGluZVxuYGBgIn0= -->
 <pre class="r"><code>library(ggplot2) # Create Elegant Data Visualisations Using the Grammar of Graphics
 library(glue) # Interpreted String Literals
-library(here) # A Simpler Way to Find Your Files
+library(here) # not installed on this machine</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiaGVyZSgpIHN0YXJ0cyBhdCBDOi9BbnRvbmlvL0Nhc2VzLTIwMjQvc2V4LWhlYWx0aC1jbGluaWNzXG4ifQ== -->
+<pre><code>here() starts at C:/Antonio/Cases-2024/sex-health-clinics</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShyZWFkcikgIyBSZWFkIFJlY3Rhbmd1bGFyIFRleHQgRGF0YVxubGlicmFyeShzZikgIyBTaW1wbGUgRmVhdHVyZXMgZm9yIFJcbmBgYCJ9 -->
+<pre class="r"><code>library(readr) # Read Rectangular Text Data
 library(sf) # Simple Features for R</code></pre>
 <!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiTGlua2luZyB0byBHRU9TIDMuMTEuMiwgR0RBTCAzLjcuMiwgUFJPSiA5LjMuMDsgc2ZfdXNlX3MyKCkgaXMgVFJVRVxuIn0= -->
+<pre><code>Linking to GEOS 3.11.2, GDAL 3.7.2, PROJ 9.3.0; sf_use_s2() is TRUE</code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>Read shape file with Toronto’s DAs:</p>
@@ -1773,6 +1797,54 @@ library(sf) # Simple Features for R</code></pre>
 <pre class="r"><code>toronto_das &lt;- st_read(&quot;shp/TorontoDAs.shp&quot;) |&gt;
   st_transform(crs = 4326)</code></pre>
 <!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiUmVhZGluZyBsYXllciBgVG9yb250b0RBcycgZnJvbSBkYXRhIHNvdXJjZSBgQzpcXEFudG9uaW9cXENhc2VzLTIwMjRcXHNleC1oZWFsdGgtY2xpbmljc1xcZGF0YS1yYXdcXHNocFxcVG9yb250b0RBcy5zaHAnIHVzaW5nIGRyaXZlciBgRVNSSSBTaGFwZWZpbGUnXG5TaW1wbGUgZmVhdHVyZSBjb2xsZWN0aW9uIHdpdGggMzc0MyBmZWF0dXJlcyBhbmQgNCBmaWVsZHNcbkdlb21ldHJ5IHR5cGU6IE1VTFRJUE9MWUdPTlxuRGltZW5zaW9uOiAgICAgWFlcbkJvdW5kaW5nIGJveDogIHhtaW46IDYwOTU1MC41IHltaW46IDQ4MjYxNzYgeG1heDogNjUxNjIyLjcgeW1heDogNDg1NzQ0N1xuUHJvamVjdGVkIENSUzogTkFEODMgLyBVVE0gem9uZSAxN05cbiJ9 -->
+<pre><code>Reading layer `TorontoDAs&#39; from data source `C:\Antonio\Cases-2024\sex-health-clinics\data-raw\shp\TorontoDAs.shp&#39; using driver `ESRI Shapefile&#39;
+Simple feature collection with 3743 features and 4 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: 609550.5 ymin: 4826176 xmax: 651622.7 ymax: 4857447
+Projected CRS: NAD83 / UTM zone 17N</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Also read the population data:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudG9yb250b19wb3AgPC0gcmVhZF9jc3YoXCJ0b3JvbnRvX3BvcC5jc3ZcIilcbmBgYCJ9 -->
+<pre class="r"><code>toronto_pop &lt;- read_csv(&quot;toronto_pop.csv&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiUm93czogMzc0MyBDb2x1bW5zOiA14pSA4pSAIENvbHVtbiBzcGVjaWZpY2F0aW9uIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgFxuRGVsaW1pdGVyOiBcIixcIlxuZGJsICg1KTogREFVSUQsIFBvcHVsYXRpb24sIFBvcHVsYXRpb24gMTUgdG8gNjQsIFBvcF82NXBsdXMsIFBvcDE1cGx1c1xu4oS5IFVzZSBgc3BlYygpYCB0byByZXRyaWV2ZSB0aGUgZnVsbCBjb2x1bW4gc3BlY2lmaWNhdGlvbiBmb3IgdGhpcyBkYXRhLlxu4oS5IFNwZWNpZnkgdGhlIGNvbHVtbiB0eXBlcyBvciBzZXQgYHNob3dfY29sX3R5cGVzID0gRkFMU0VgIHRvIHF1aWV0IHRoaXMgbWVzc2FnZS5cbiJ9 -->
+<pre><code>Rows: 3743 Columns: 5── Column specification ─────────────────────────────────────────────────────────────────────────────────────────────────────
+Delimiter: &quot;,&quot;
+dbl (5): DAUID, Population, Population 15 to 64, Pop_65plus, Pop15plus
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Prepare columns to join with simple features:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Join population data to simple features table:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudG9yb250b19kYXMgPC0gdG9yb250b19kYXMgfD5cbiAgbGVmdF9qb2luKHRvcm9udG9fcG9wLFxuICAgICAgICAgICAgYnkgPSBcIkRBVUlEXCIpXG5cbmBgYCJ9 -->
+<pre class="r"><code>toronto_das &lt;- toronto_das |&gt;
+  left_join(toronto_pop,
+            by = &quot;DAUID&quot;)
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiRXJyb3IgaW4gYHNmX2NvbHVtbiAlaW4lIG5hbWVzKGcpYDpcbiEgQ2FuJ3Qgam9pbiBgeCREQVVJRGAgd2l0aCBgeSREQVVJRGAgZHVlIHRvIGluY29tcGF0aWJsZSB0eXBlcy5cbuKEuSBgeCREQVVJRGAgaXMgYSA8Y2hhcmFjdGVyPi5cbuKEuSBgeSREQVVJRGAgaXMgYSA8ZG91YmxlPi5cbkJhY2t0cmFjZTpcbiAxLiBkcGx5cjo6bGVmdF9qb2luKHRvcm9udG9fZGFzLCB0b3JvbnRvX3BvcCwgYnkgPSBcIkRBVUlEXCIpXG4gNi4gZHBseXI6OjpsZWZ0X2pvaW4uZGF0YS5mcmFtZSh0b3JvbnRvX2RhcywgdG9yb250b19wb3AsIGJ5ID0gXCJEQVVJRFwiKVxuIn0= -->
+<pre><code>Error in `sf_column %in% names(g)`:
+! Can&#39;t join `x$DAUID` with `y$DAUID` due to incompatible types.
+ℹ `x$DAUID` is a &lt;character&gt;.
+ℹ `y$DAUID` is a &lt;double&gt;.
+Backtrace:
+ 1. dplyr::left_join(toronto_das, toronto_pop, by = &quot;DAUID&quot;)
+ 6. dplyr:::left_join.data.frame(toronto_das, toronto_pop, by = &quot;DAUID&quot;)</code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>Save the data object:</p>
@@ -1788,7 +1860,7 @@ library(sf) # Simple Features for R</code></pre>
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIlJlYWQgc2hhcGVmaWxlIHdpdGggZGVtb2dyYXBoaWMgaW5mb3JtYXRpb24iDQpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sNCi0tLQ0KDQpJbiB0aGlzIG5vdGVib29rIHdlIHJlYWQgdGhlIHNoYXBlIGZpbGUgd2l0aCB0aGUgREFzLiBUaGlzIGlzIHVzZWQgZm9yIG1hcHBpbmcgYW5kIGFkZGl0aW9uYWwgc3BhdGlhbCBhbmFseXNpcy4NCg0KTG9hZCB0aGUgcGFja2FnZXM6DQpgYGB7cn0NCmxpYnJhcnkoZ2dwbG90MikgIyBDcmVhdGUgRWxlZ2FudCBEYXRhIFZpc3VhbGlzYXRpb25zIFVzaW5nIHRoZSBHcmFtbWFyIG9mIEdyYXBoaWNzDQpsaWJyYXJ5KGdsdWUpICMgSW50ZXJwcmV0ZWQgU3RyaW5nIExpdGVyYWxzDQpsaWJyYXJ5KGhlcmUpICMgQSBTaW1wbGVyIFdheSB0byBGaW5kIFlvdXIgRmlsZXMNCmxpYnJhcnkoc2YpICMgU2ltcGxlIEZlYXR1cmVzIGZvciBSDQpgYGANCg0KUmVhZCBzaGFwZSBmaWxlIHdpdGggVG9yb250bydzIERBczoNCmBgYHtyfQ0KdG9yb250b19kYXMgPC0gc3RfcmVhZCgic2hwL1Rvcm9udG9EQXMuc2hwIikgfD4NCiAgc3RfdHJhbnNmb3JtKGNycyA9IDQzMjYpDQpgYGANCg0KU2F2ZSB0aGUgZGF0YSBvYmplY3Q6DQpgYGB7cn0NCnNhdmUodG9yb250b19kYXMsDQogICAgIGZpbGUgPSBnbHVlKGhlcmU6OmhlcmUoKSwgDQogICAgICAgICAgICAgICAgICIvZGF0YS90b3JvbnRvX2Rhcy5yZGEiKSwgDQogICAgIGNvbXByZXNzID0gInh6IikNCmBgYA0KDQoNCg==</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIlJlYWQgc2hhcGVmaWxlIHdpdGggZGVtb2dyYXBoaWMgaW5mb3JtYXRpb24iDQpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sNCi0tLQ0KDQpJbiB0aGlzIG5vdGVib29rIHdlIHJlYWQgdGhlIHNoYXBlIGZpbGUgd2l0aCB0aGUgREFzLiBUaGlzIGlzIHVzZWQgZm9yIG1hcHBpbmcgYW5kIGFkZGl0aW9uYWwgc3BhdGlhbCBhbmFseXNpcy4NCg0KTG9hZCB0aGUgcGFja2FnZXM6DQpgYGB7cn0NCmxpYnJhcnkoZHBseXIpICMgQSBHcmFtbWFyIG9mIERhdGEgTWFuaXB1bGF0aW9uDQpsaWJyYXJ5KGdncGxvdDIpICMgQ3JlYXRlIEVsZWdhbnQgRGF0YSBWaXN1YWxpc2F0aW9ucyBVc2luZyB0aGUgR3JhbW1hciBvZiBHcmFwaGljcw0KbGlicmFyeShnbHVlKSAjIEludGVycHJldGVkIFN0cmluZyBMaXRlcmFscw0KbGlicmFyeShoZXJlKSAjIG5vdCBpbnN0YWxsZWQgb24gdGhpcyBtYWNoaW5lDQpsaWJyYXJ5KHJlYWRyKSAjIFJlYWQgUmVjdGFuZ3VsYXIgVGV4dCBEYXRhDQpsaWJyYXJ5KHNmKSAjIFNpbXBsZSBGZWF0dXJlcyBmb3IgUg0KYGBgDQoNClJlYWQgc2hhcGUgZmlsZSB3aXRoIFRvcm9udG8ncyBEQXM6DQpgYGB7cn0NCnRvcm9udG9fZGFzIDwtIHN0X3JlYWQoInNocC9Ub3JvbnRvREFzLnNocCIpIHw+DQogIHN0X3RyYW5zZm9ybShjcnMgPSA0MzI2KQ0KYGBgDQoNCkFsc28gcmVhZCB0aGUgcG9wdWxhdGlvbiBkYXRhOg0KYGBge3J9DQp0b3JvbnRvX3BvcCA8LSByZWFkX2NzdigidG9yb250b19wb3AuY3N2IikNCmBgYA0KDQpQcmVwYXJlIGNvbHVtbnMgdG8gam9pbiB3aXRoIHNpbXBsZSBmZWF0dXJlczoNCmBgYHtyfQ0KdG9yb250b19wb3AgPC0gdG9yb250b19wb3AgfD4NCiAgICAgICAgICAgICAgbXV0YXRlKERBVUlEID0gYXMuY2hhcmFjdGVyKERBVUlEKSkgfD4NCiAgcmVuYW1lKFBvcF8xNV90b182NCA9IGBQb3B1bGF0aW9uIDE1IHRvIDY0YCkNCg0KYGBgDQoNCg0KSm9pbiBwb3B1bGF0aW9uIGRhdGEgdG8gc2ltcGxlIGZlYXR1cmVzIHRhYmxlOg0KYGBge3J9DQp0b3JvbnRvX2RhcyA8LSB0b3JvbnRvX2RhcyB8Pg0KICBsZWZ0X2pvaW4odG9yb250b19wb3AsDQogICAgICAgICAgICBieSA9ICJEQVVJRCIpDQpgYGANCg0KU2F2ZSB0aGUgZGF0YSBvYmplY3Q6DQpgYGB7cn0NCnNhdmUodG9yb250b19kYXMsDQogICAgIGZpbGUgPSBnbHVlKGhlcmU6OmhlcmUoKSwgDQogICAgICAgICAgICAgICAgICIvZGF0YS90b3JvbnRvX2Rhcy5yZGEiKSwgDQogICAgIGNvbXByZXNzID0gInh6IikNCmBgYA0KDQo=</div>
 
 
 
