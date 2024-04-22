@@ -21,9 +21,10 @@ toronto_das <- st_read("shp/TorontoDAs.shp") |>
   st_transform(crs = 4326)
 ```
 
-Also read the population data:
+Also read the population and socio-economic and demographic data files:
 ```{r}
 toronto_pop <- read_csv("toronto_pop.csv")
+toronto_sed <- read_csv("census_data_nogeom.csv")
 ```
 
 Prepare columns to join with simple features:
@@ -32,6 +33,19 @@ toronto_pop <- toronto_pop |>
               mutate(DAUID = as.character(DAUID)) |>
   rename(Pop_15_to_64 = `Population 15 to 64`)
 
+toronto_sed <- toronto_sed |>
+  transmute(DAUID = as.character(DAUID),
+            Median_Income = `Median income`,
+            Low_Income = `Low Income`,
+            Average_Age = `Average Age`,
+            Visible_Minority_Pop = `Visible minority population`,
+            Prop_Visible_Minority = `Visible minority population`/Population,
+            Indigenous_Pop = `Indigenous population`,
+            Prop_Indigenous_Pop = `Indigenous population`/Population,
+            One_Parent_Families = `Total one-parent families`,
+            Prop_One_Parent_Families = `Total one-parent families`/Households,
+            Prop_Female = propfemale)
+
 ```
 
 
@@ -39,6 +53,8 @@ Join population data to simple features table:
 ```{r}
 toronto_das <- toronto_das |>
   left_join(toronto_pop,
+            by = "DAUID") |>
+  left_join(toronto_sed,
             by = "DAUID")
 ```
 

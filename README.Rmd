@@ -214,11 +214,13 @@ Plot the deviations of the availability per capita relative to the equality line
 ```{r equity-plot, include = TRUE}
 # Equal proportion is clinics divided by population
 ep <- 15/sum(toronto_das$Pop15plus, na.rm = TRUE)
+toronto_das <- toronto_das |>
+  mutate(dev_v = v - ep)
 
 # Plot deviations from equal distribution
 ggplot() +
   geom_sf(data = toronto_das,
-          aes(fill = v - ep),
+          aes(fill = dev_v),
           color = NA) +
   scale_fill_gradient2(name = "Availability per capita",
                        #palette = "Reds", 
@@ -228,3 +230,63 @@ ggplot() +
   theme_minimal()
 ```
 
+```{r}
+toronto_das |>
+  st_drop_geometry() |>
+  select(Median_Income,
+         S,
+         V) |>
+  pivot_longer(-Median_Income,
+               names_to = "score",
+               values_to = "value") |>
+  ggplot(data = ) +
+  geom_point(aes(x = Median_Income,
+                 y = value)) +
+  theme_minimal() +
+  facet_wrap(~ score, scales = "free_y")
+```
+
+```{r}
+cor(toronto_das$Median_Income, 
+    toronto_das$S, 
+    use = "pairwise.complete.obs")
+
+cor(toronto_das$Median_Income, 
+    toronto_das$V, 
+    use = "pairwise.complete.obs")
+```
+
+```{r}
+toronto_das |>
+  ggplot() +
+  geom_point(aes(x = Median_Income,
+                 y = dev_v)) +
+  theme_minimal()
+```
+
+```{r}
+cor(toronto_das$Median_Income, 
+    toronto_das$dev_v, 
+    use = "pairwise.complete.obs")
+```
+
+
+
+```{r}
+mod <- lm(dev_v ~ Median_Income + Low_Income + Average_Age + Prop_Visible_Minority + Prop_Indigenous_Pop + Prop_One_Parent_Families + Prop_Female,
+   data = toronto_das |>
+     st_drop_geometry() |>
+     mutate(Median_Income = Median_Income/10000))
+
+summary(mod)
+```
+
+```{r}
+mod <- lm(dev_v ~ Median_Income + Low_Income + Average_Age + Prop_Female,
+   data = toronto_das |>
+     st_drop_geometry() |>
+     mutate(dev_v = dev_v/ep,
+            Median_Income = Median_Income/10000))
+
+summary(mod)
+```

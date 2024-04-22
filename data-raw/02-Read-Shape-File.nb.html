@@ -1797,8 +1797,9 @@ library(sf) # Simple Features for R</code></pre>
 <pre class="r"><code>toronto_das &lt;- st_read(&quot;shp/TorontoDAs.shp&quot;) |&gt;
   st_transform(crs = 4326)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiUmVhZGluZyBsYXllciBgVG9yb250b0RBcycgZnJvbSBkYXRhIHNvdXJjZSBgQzpcXEFudG9uaW9cXENhc2VzLTIwMjRcXHNleC1oZWFsdGgtY2xpbmljc1xcZGF0YS1yYXdcXHNocFxcVG9yb250b0RBcy5zaHAnIHVzaW5nIGRyaXZlciBgRVNSSSBTaGFwZWZpbGUnXG5TaW1wbGUgZmVhdHVyZSBjb2xsZWN0aW9uIHdpdGggMzc0MyBmZWF0dXJlcyBhbmQgNCBmaWVsZHNcbkdlb21ldHJ5IHR5cGU6IE1VTFRJUE9MWUdPTlxuRGltZW5zaW9uOiAgICAgWFlcbkJvdW5kaW5nIGJveDogIHhtaW46IDYwOTU1MC41IHltaW46IDQ4MjYxNzYgeG1heDogNjUxNjIyLjcgeW1heDogNDg1NzQ0N1xuUHJvamVjdGVkIENSUzogTkFEODMgLyBVVE0gem9uZSAxN05cbiJ9 -->
-<pre><code>Reading layer `TorontoDAs&#39; from data source `C:\Antonio\Cases-2024\sex-health-clinics\data-raw\shp\TorontoDAs.shp&#39; using driver `ESRI Shapefile&#39;
+<!-- rnb-output-begin eyJkYXRhIjoiUmVhZGluZyBsYXllciBgVG9yb250b0RBcycgZnJvbSBkYXRhIHNvdXJjZSBcbiAgYEM6XFxBbnRvbmlvXFxDYXNlcy0yMDI0XFxzZXgtaGVhbHRoLWNsaW5pY3NcXGRhdGEtcmF3XFxzaHBcXFRvcm9udG9EQXMuc2hwJyB1c2luZyBkcml2ZXIgYEVTUkkgU2hhcGVmaWxlJ1xuU2ltcGxlIGZlYXR1cmUgY29sbGVjdGlvbiB3aXRoIDM3NDMgZmVhdHVyZXMgYW5kIDQgZmllbGRzXG5HZW9tZXRyeSB0eXBlOiBNVUxUSVBPTFlHT05cbkRpbWVuc2lvbjogICAgIFhZXG5Cb3VuZGluZyBib3g6ICB4bWluOiA2MDk1NTAuNSB5bWluOiA0ODI2MTc2IHhtYXg6IDY1MTYyMi43IHltYXg6IDQ4NTc0NDdcblByb2plY3RlZCBDUlM6IE5BRDgzIC8gVVRNIHpvbmUgMTdOXG4ifQ== -->
+<pre><code>Reading layer `TorontoDAs&#39; from data source 
+  `C:\Antonio\Cases-2024\sex-health-clinics\data-raw\shp\TorontoDAs.shp&#39; using driver `ESRI Shapefile&#39;
 Simple feature collection with 3743 features and 4 fields
 Geometry type: MULTIPOLYGON
 Dimension:     XY
@@ -1807,16 +1808,28 @@ Projected CRS: NAD83 / UTM zone 17N</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>Also read the population data:</p>
+<p>Also read the population and socio-economic and demographic data
+files:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudG9yb250b19wb3AgPC0gcmVhZF9jc3YoXCJ0b3JvbnRvX3BvcC5jc3ZcIilcbmBgYCJ9 -->
 <pre class="r"><code>toronto_pop &lt;- read_csv(&quot;toronto_pop.csv&quot;)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiUm93czogMzc0MyBDb2x1bW5zOiA14pSA4pSAIENvbHVtbiBzcGVjaWZpY2F0aW9uIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgFxuRGVsaW1pdGVyOiBcIixcIlxuZGJsICg1KTogREFVSUQsIFBvcHVsYXRpb24sIFBvcHVsYXRpb24gMTUgdG8gNjQsIFBvcF82NXBsdXMsIFBvcDE1cGx1c1xu4oS5IFVzZSBgc3BlYygpYCB0byByZXRyaWV2ZSB0aGUgZnVsbCBjb2x1bW4gc3BlY2lmaWNhdGlvbiBmb3IgdGhpcyBkYXRhLlxu4oS5IFNwZWNpZnkgdGhlIGNvbHVtbiB0eXBlcyBvciBzZXQgYHNob3dfY29sX3R5cGVzID0gRkFMU0VgIHRvIHF1aWV0IHRoaXMgbWVzc2FnZS5cbiJ9 -->
-<pre><code>Rows: 3743 Columns: 5── Column specification ─────────────────────────────────────────────────────────────────────────────────────────────────────
+<!-- rnb-output-begin eyJkYXRhIjoiUm93czogMzc0MyBDb2x1bW5zOiA14pSA4pSAIENvbHVtbiBzcGVjaWZpY2F0aW9uIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgFxuRGVsaW1pdGVyOiBcIixcIlxuZGJsICg1KTogREFVSUQsIFBvcHVsYXRpb24sIFBvcHVsYXRpb24gMTUgdG8gNjQsIFBvcF82NXBsdXMsIFBvcDE1cGx1c1xu4oS5IFVzZSBgc3BlYygpYCB0byByZXRyaWV2ZSB0aGUgZnVsbCBjb2x1bW4gc3BlY2lmaWNhdGlvbiBmb3IgdGhpcyBkYXRhLlxu4oS5IFNwZWNpZnkgdGhlIGNvbHVtbiB0eXBlcyBvciBzZXQgYHNob3dfY29sX3R5cGVzID0gRkFMU0VgIHRvIHF1aWV0IHRoaXMgbWVzc2FnZS5cbiJ9 -->
+<pre><code>Rows: 3743 Columns: 5── Column specification ────────────────────────────────────────────────────────────────────────────
 Delimiter: &quot;,&quot;
 dbl (5): DAUID, Population, Population 15 to 64, Pop_65plus, Pop15plus
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudG9yb250b19zZWQgPC0gcmVhZF9jc3YoXCJjZW5zdXNfZGF0YV9ub2dlb20uY3N2XCIpXG5gYGAifQ== -->
+<pre class="r"><code>toronto_sed &lt;- read_csv(&quot;census_data_nogeom.csv&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiUm93czogMzc0MyBDb2x1bW5zOiAyNuKUgOKUgCBDb2x1bW4gc3BlY2lmaWNhdGlvbiDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIBcbkRlbGltaXRlcjogXCIsXCJcbmNociAgKDEpOiBUeXBlXG5kYmwgKDI1KTogU2hhcGUgQXJlYSwgUXVhbGl0eSBGbGFncywgREFVSUQsIEhvdXNlaG9sZHMsIENEX1VJRCwgRHdlbGxpbmdzLCBQb3B1bGF0aW9uLCBuYW1lLCBDU0QuLi5cbuKEuSBVc2UgYHNwZWMoKWAgdG8gcmV0cmlldmUgdGhlIGZ1bGwgY29sdW1uIHNwZWNpZmljYXRpb24gZm9yIHRoaXMgZGF0YS5cbuKEuSBTcGVjaWZ5IHRoZSBjb2x1bW4gdHlwZXMgb3Igc2V0IGBzaG93X2NvbF90eXBlcyA9IEZBTFNFYCB0byBxdWlldCB0aGlzIG1lc3NhZ2UuXG4ifQ== -->
+<pre><code>Rows: 3743 Columns: 26── Column specification ────────────────────────────────────────────────────────────────────────────
+Delimiter: &quot;,&quot;
+chr  (1): Type
+dbl (25): Shape Area, Quality Flags, DAUID, Households, CD_UID, Dwellings, Population, name, CSD...
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
 <!-- rnb-output-end -->
@@ -1825,26 +1838,37 @@ dbl (5): DAUID, Population, Population 15 to 64, Pop_65plus, Pop15plus
 <p>Prepare columns to join with simple features:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudG9yb250b19wb3AgPC0gdG9yb250b19wb3AgfD5cbiAgICAgICAgICAgICAgbXV0YXRlKERBVUlEID0gYXMuY2hhcmFjdGVyKERBVUlEKSkgfD5cbiAgcmVuYW1lKFBvcF8xNV90b182NCA9IGBQb3B1bGF0aW9uIDE1IHRvIDY0YClcblxudG9yb250b19zZWQgPC0gdG9yb250b19zZWQgfD5cbiAgdHJhbnNtdXRlKERBVUlEID0gYXMuY2hhcmFjdGVyKERBVUlEKSxcbiAgICAgICAgICAgIE1lZGlhbl9JbmNvbWUgPSBgTWVkaWFuIGluY29tZWAsXG4gICAgICAgICAgICBMb3dfSW5jb21lID0gYExvdyBJbmNvbWVgLFxuICAgICAgICAgICAgQXZlcmFnZV9BZ2UgPSBgQXZlcmFnZSBBZ2VgLFxuICAgICAgICAgICAgVmlzaWJsZV9NaW5vcml0eV9Qb3AgPSBgVmlzaWJsZSBtaW5vcml0eSBwb3B1bGF0aW9uYCxcbiAgICAgICAgICAgIFByb3BfVmlzaWJsZV9NaW5vcml0eSA9IGBWaXNpYmxlIG1pbm9yaXR5IHBvcHVsYXRpb25gL1BvcHVsYXRpb24sXG4gICAgICAgICAgICBJbmRpZ2Vub3VzX1BvcCA9IGBJbmRpZ2Vub3VzIHBvcHVsYXRpb25gLFxuICAgICAgICAgICAgUHJvcF9JbmRpZ2Vub3VzX1BvcCA9IGBJbmRpZ2Vub3VzIHBvcHVsYXRpb25gL1BvcHVsYXRpb24sXG4gICAgICAgICAgICBPbmVfUGFyZW50X0ZhbWlsaWVzID0gYFRvdGFsIG9uZS1wYXJlbnQgZmFtaWxpZXNgLFxuICAgICAgICAgICAgUHJvcF9PbmVfUGFyZW50X0ZhbWlsaWVzID0gYFRvdGFsIG9uZS1wYXJlbnQgZmFtaWxpZXNgL0hvdXNlaG9sZHMsXG4gICAgICAgICAgICBQcm9wX0ZlbWFsZSA9IHByb3BmZW1hbGUpXG5cbmBgYCJ9 -->
+<pre class="r"><code>toronto_pop &lt;- toronto_pop |&gt;
+              mutate(DAUID = as.character(DAUID)) |&gt;
+  rename(Pop_15_to_64 = `Population 15 to 64`)
+
+toronto_sed &lt;- toronto_sed |&gt;
+  transmute(DAUID = as.character(DAUID),
+            Median_Income = `Median income`,
+            Low_Income = `Low Income`,
+            Average_Age = `Average Age`,
+            Visible_Minority_Pop = `Visible minority population`,
+            Prop_Visible_Minority = `Visible minority population`/Population,
+            Indigenous_Pop = `Indigenous population`,
+            Prop_Indigenous_Pop = `Indigenous population`/Population,
+            One_Parent_Families = `Total one-parent families`,
+            Prop_One_Parent_Families = `Total one-parent families`/Households,
+            Prop_Female = propfemale)
+</code></pre>
+<!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>Join population data to simple features table:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudG9yb250b19kYXMgPC0gdG9yb250b19kYXMgfD5cbiAgbGVmdF9qb2luKHRvcm9udG9fcG9wLFxuICAgICAgICAgICAgYnkgPSBcIkRBVUlEXCIpXG5cbmBgYCJ9 -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudG9yb250b19kYXMgPC0gdG9yb250b19kYXMgfD5cbiAgbGVmdF9qb2luKHRvcm9udG9fcG9wLFxuICAgICAgICAgICAgYnkgPSBcIkRBVUlEXCIpIHw+XG4gIGxlZnRfam9pbih0b3JvbnRvX3NlZCxcbiAgICAgICAgICAgIGJ5ID0gXCJEQVVJRFwiKVxuYGBgIn0= -->
 <pre class="r"><code>toronto_das &lt;- toronto_das |&gt;
   left_join(toronto_pop,
-            by = &quot;DAUID&quot;)
-</code></pre>
+            by = &quot;DAUID&quot;) |&gt;
+  left_join(toronto_sed,
+            by = &quot;DAUID&quot;)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiRXJyb3IgaW4gYHNmX2NvbHVtbiAlaW4lIG5hbWVzKGcpYDpcbiEgQ2FuJ3Qgam9pbiBgeCREQVVJRGAgd2l0aCBgeSREQVVJRGAgZHVlIHRvIGluY29tcGF0aWJsZSB0eXBlcy5cbuKEuSBgeCREQVVJRGAgaXMgYSA8Y2hhcmFjdGVyPi5cbuKEuSBgeSREQVVJRGAgaXMgYSA8ZG91YmxlPi5cbkJhY2t0cmFjZTpcbiAxLiBkcGx5cjo6bGVmdF9qb2luKHRvcm9udG9fZGFzLCB0b3JvbnRvX3BvcCwgYnkgPSBcIkRBVUlEXCIpXG4gNi4gZHBseXI6OjpsZWZ0X2pvaW4uZGF0YS5mcmFtZSh0b3JvbnRvX2RhcywgdG9yb250b19wb3AsIGJ5ID0gXCJEQVVJRFwiKVxuIn0= -->
-<pre><code>Error in `sf_column %in% names(g)`:
-! Can&#39;t join `x$DAUID` with `y$DAUID` due to incompatible types.
-ℹ `x$DAUID` is a &lt;character&gt;.
-ℹ `y$DAUID` is a &lt;double&gt;.
-Backtrace:
- 1. dplyr::left_join(toronto_das, toronto_pop, by = &quot;DAUID&quot;)
- 6. dplyr:::left_join.data.frame(toronto_das, toronto_pop, by = &quot;DAUID&quot;)</code></pre>
-<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>Save the data object:</p>
@@ -1860,7 +1884,7 @@ Backtrace:
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIlJlYWQgc2hhcGVmaWxlIHdpdGggZGVtb2dyYXBoaWMgaW5mb3JtYXRpb24iDQpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sNCi0tLQ0KDQpJbiB0aGlzIG5vdGVib29rIHdlIHJlYWQgdGhlIHNoYXBlIGZpbGUgd2l0aCB0aGUgREFzLiBUaGlzIGlzIHVzZWQgZm9yIG1hcHBpbmcgYW5kIGFkZGl0aW9uYWwgc3BhdGlhbCBhbmFseXNpcy4NCg0KTG9hZCB0aGUgcGFja2FnZXM6DQpgYGB7cn0NCmxpYnJhcnkoZHBseXIpICMgQSBHcmFtbWFyIG9mIERhdGEgTWFuaXB1bGF0aW9uDQpsaWJyYXJ5KGdncGxvdDIpICMgQ3JlYXRlIEVsZWdhbnQgRGF0YSBWaXN1YWxpc2F0aW9ucyBVc2luZyB0aGUgR3JhbW1hciBvZiBHcmFwaGljcw0KbGlicmFyeShnbHVlKSAjIEludGVycHJldGVkIFN0cmluZyBMaXRlcmFscw0KbGlicmFyeShoZXJlKSAjIG5vdCBpbnN0YWxsZWQgb24gdGhpcyBtYWNoaW5lDQpsaWJyYXJ5KHJlYWRyKSAjIFJlYWQgUmVjdGFuZ3VsYXIgVGV4dCBEYXRhDQpsaWJyYXJ5KHNmKSAjIFNpbXBsZSBGZWF0dXJlcyBmb3IgUg0KYGBgDQoNClJlYWQgc2hhcGUgZmlsZSB3aXRoIFRvcm9udG8ncyBEQXM6DQpgYGB7cn0NCnRvcm9udG9fZGFzIDwtIHN0X3JlYWQoInNocC9Ub3JvbnRvREFzLnNocCIpIHw+DQogIHN0X3RyYW5zZm9ybShjcnMgPSA0MzI2KQ0KYGBgDQoNCkFsc28gcmVhZCB0aGUgcG9wdWxhdGlvbiBkYXRhOg0KYGBge3J9DQp0b3JvbnRvX3BvcCA8LSByZWFkX2NzdigidG9yb250b19wb3AuY3N2IikNCmBgYA0KDQpQcmVwYXJlIGNvbHVtbnMgdG8gam9pbiB3aXRoIHNpbXBsZSBmZWF0dXJlczoNCmBgYHtyfQ0KdG9yb250b19wb3AgPC0gdG9yb250b19wb3AgfD4NCiAgICAgICAgICAgICAgbXV0YXRlKERBVUlEID0gYXMuY2hhcmFjdGVyKERBVUlEKSkgfD4NCiAgcmVuYW1lKFBvcF8xNV90b182NCA9IGBQb3B1bGF0aW9uIDE1IHRvIDY0YCkNCg0KYGBgDQoNCg0KSm9pbiBwb3B1bGF0aW9uIGRhdGEgdG8gc2ltcGxlIGZlYXR1cmVzIHRhYmxlOg0KYGBge3J9DQp0b3JvbnRvX2RhcyA8LSB0b3JvbnRvX2RhcyB8Pg0KICBsZWZ0X2pvaW4odG9yb250b19wb3AsDQogICAgICAgICAgICBieSA9ICJEQVVJRCIpDQpgYGANCg0KU2F2ZSB0aGUgZGF0YSBvYmplY3Q6DQpgYGB7cn0NCnNhdmUodG9yb250b19kYXMsDQogICAgIGZpbGUgPSBnbHVlKGhlcmU6OmhlcmUoKSwgDQogICAgICAgICAgICAgICAgICIvZGF0YS90b3JvbnRvX2Rhcy5yZGEiKSwgDQogICAgIGNvbXByZXNzID0gInh6IikNCmBgYA0KDQo=</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIlJlYWQgc2hhcGVmaWxlIHdpdGggZGVtb2dyYXBoaWMgaW5mb3JtYXRpb24iDQpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sNCi0tLQ0KDQpJbiB0aGlzIG5vdGVib29rIHdlIHJlYWQgdGhlIHNoYXBlIGZpbGUgd2l0aCB0aGUgREFzLiBUaGlzIGlzIHVzZWQgZm9yIG1hcHBpbmcgYW5kIGFkZGl0aW9uYWwgc3BhdGlhbCBhbmFseXNpcy4NCg0KTG9hZCB0aGUgcGFja2FnZXM6DQpgYGB7cn0NCmxpYnJhcnkoZHBseXIpICMgQSBHcmFtbWFyIG9mIERhdGEgTWFuaXB1bGF0aW9uDQpsaWJyYXJ5KGdncGxvdDIpICMgQ3JlYXRlIEVsZWdhbnQgRGF0YSBWaXN1YWxpc2F0aW9ucyBVc2luZyB0aGUgR3JhbW1hciBvZiBHcmFwaGljcw0KbGlicmFyeShnbHVlKSAjIEludGVycHJldGVkIFN0cmluZyBMaXRlcmFscw0KbGlicmFyeShoZXJlKSAjIG5vdCBpbnN0YWxsZWQgb24gdGhpcyBtYWNoaW5lDQpsaWJyYXJ5KHJlYWRyKSAjIFJlYWQgUmVjdGFuZ3VsYXIgVGV4dCBEYXRhDQpsaWJyYXJ5KHNmKSAjIFNpbXBsZSBGZWF0dXJlcyBmb3IgUg0KYGBgDQoNClJlYWQgc2hhcGUgZmlsZSB3aXRoIFRvcm9udG8ncyBEQXM6DQpgYGB7cn0NCnRvcm9udG9fZGFzIDwtIHN0X3JlYWQoInNocC9Ub3JvbnRvREFzLnNocCIpIHw+DQogIHN0X3RyYW5zZm9ybShjcnMgPSA0MzI2KQ0KYGBgDQoNCkFsc28gcmVhZCB0aGUgcG9wdWxhdGlvbiBhbmQgc29jaW8tZWNvbm9taWMgYW5kIGRlbW9ncmFwaGljIGRhdGEgZmlsZXM6DQpgYGB7cn0NCnRvcm9udG9fcG9wIDwtIHJlYWRfY3N2KCJ0b3JvbnRvX3BvcC5jc3YiKQ0KdG9yb250b19zZWQgPC0gcmVhZF9jc3YoImNlbnN1c19kYXRhX25vZ2VvbS5jc3YiKQ0KYGBgDQoNClByZXBhcmUgY29sdW1ucyB0byBqb2luIHdpdGggc2ltcGxlIGZlYXR1cmVzOg0KYGBge3J9DQp0b3JvbnRvX3BvcCA8LSB0b3JvbnRvX3BvcCB8Pg0KICAgICAgICAgICAgICBtdXRhdGUoREFVSUQgPSBhcy5jaGFyYWN0ZXIoREFVSUQpKSB8Pg0KICByZW5hbWUoUG9wXzE1X3RvXzY0ID0gYFBvcHVsYXRpb24gMTUgdG8gNjRgKQ0KDQp0b3JvbnRvX3NlZCA8LSB0b3JvbnRvX3NlZCB8Pg0KICB0cmFuc211dGUoREFVSUQgPSBhcy5jaGFyYWN0ZXIoREFVSUQpLA0KICAgICAgICAgICAgTWVkaWFuX0luY29tZSA9IGBNZWRpYW4gaW5jb21lYCwNCiAgICAgICAgICAgIExvd19JbmNvbWUgPSBgTG93IEluY29tZWAsDQogICAgICAgICAgICBBdmVyYWdlX0FnZSA9IGBBdmVyYWdlIEFnZWAsDQogICAgICAgICAgICBWaXNpYmxlX01pbm9yaXR5X1BvcCA9IGBWaXNpYmxlIG1pbm9yaXR5IHBvcHVsYXRpb25gLA0KICAgICAgICAgICAgUHJvcF9WaXNpYmxlX01pbm9yaXR5ID0gYFZpc2libGUgbWlub3JpdHkgcG9wdWxhdGlvbmAvUG9wdWxhdGlvbiwNCiAgICAgICAgICAgIEluZGlnZW5vdXNfUG9wID0gYEluZGlnZW5vdXMgcG9wdWxhdGlvbmAsDQogICAgICAgICAgICBQcm9wX0luZGlnZW5vdXNfUG9wID0gYEluZGlnZW5vdXMgcG9wdWxhdGlvbmAvUG9wdWxhdGlvbiwNCiAgICAgICAgICAgIE9uZV9QYXJlbnRfRmFtaWxpZXMgPSBgVG90YWwgb25lLXBhcmVudCBmYW1pbGllc2AsDQogICAgICAgICAgICBQcm9wX09uZV9QYXJlbnRfRmFtaWxpZXMgPSBgVG90YWwgb25lLXBhcmVudCBmYW1pbGllc2AvSG91c2Vob2xkcywNCiAgICAgICAgICAgIFByb3BfRmVtYWxlID0gcHJvcGZlbWFsZSkNCg0KYGBgDQoNCg0KSm9pbiBwb3B1bGF0aW9uIGRhdGEgdG8gc2ltcGxlIGZlYXR1cmVzIHRhYmxlOg0KYGBge3J9DQp0b3JvbnRvX2RhcyA8LSB0b3JvbnRvX2RhcyB8Pg0KICBsZWZ0X2pvaW4odG9yb250b19wb3AsDQogICAgICAgICAgICBieSA9ICJEQVVJRCIpIHw+DQogIGxlZnRfam9pbih0b3JvbnRvX3NlZCwNCiAgICAgICAgICAgIGJ5ID0gIkRBVUlEIikNCmBgYA0KDQpTYXZlIHRoZSBkYXRhIG9iamVjdDoNCmBgYHtyfQ0Kc2F2ZSh0b3JvbnRvX2RhcywNCiAgICAgZmlsZSA9IGdsdWUoaGVyZTo6aGVyZSgpLCANCiAgICAgICAgICAgICAgICAgIi9kYXRhL3Rvcm9udG9fZGFzLnJkYSIpLCANCiAgICAgY29tcHJlc3MgPSAieHoiKQ0KYGBgDQoNCg==</div>
 
 
 

@@ -278,11 +278,13 @@ serviced):
 ``` r
 # Equal proportion is clinics divided by population
 ep <- 15/sum(toronto_das$Pop15plus, na.rm = TRUE)
+toronto_das <- toronto_das |>
+  mutate(dev_v = v - ep)
 
 # Plot deviations from equal distribution
 ggplot() +
   geom_sf(data = toronto_das,
-          aes(fill = v - ep),
+          aes(fill = dev_v),
           color = NA) +
   scale_fill_gradient2(name = "Availability per capita",
                        #palette = "Reds", 
@@ -293,3 +295,125 @@ ggplot() +
 ```
 
 ![](README_files/figure-gfm/equity-plot-1.png)<!-- -->
+
+``` r
+toronto_das |>
+  st_drop_geometry() |>
+  select(Median_Income,
+         S,
+         V) |>
+  pivot_longer(-Median_Income,
+               names_to = "score",
+               values_to = "value") |>
+  ggplot(data = ) +
+  geom_point(aes(x = Median_Income,
+                 y = value)) +
+  theme_minimal() +
+  facet_wrap(~ score, scales = "free_y")
+#> Warning: Removed 140 rows containing missing values or values outside the scale range
+#> (`geom_point()`).
+```
+
+![](README_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
+
+``` r
+cor(toronto_das$Median_Income, 
+    toronto_das$S, 
+    use = "pairwise.complete.obs")
+#> [1] 0.1660929
+
+cor(toronto_das$Median_Income, 
+    toronto_das$V, 
+    use = "pairwise.complete.obs")
+#> [1] -0.009030069
+```
+
+``` r
+toronto_das |>
+  ggplot() +
+  geom_point(aes(x = Median_Income,
+                 y = dev_v)) +
+  theme_minimal()
+#> Warning: Removed 70 rows containing missing values or values outside the scale range
+#> (`geom_point()`).
+```
+
+![](README_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+
+``` r
+cor(toronto_das$Median_Income, 
+    toronto_das$dev_v, 
+    use = "pairwise.complete.obs")
+#> [1] 0.08570984
+```
+
+``` r
+mod <- lm(dev_v ~ Median_Income + Low_Income + Average_Age + Prop_Visible_Minority + Prop_Indigenous_Pop + Prop_One_Parent_Families + Prop_Female,
+   data = toronto_das |>
+     st_drop_geometry() |>
+     mutate(Median_Income = Median_Income/10000))
+
+summary(mod)
+#> 
+#> Call:
+#> lm(formula = dev_v ~ Median_Income + Low_Income + Average_Age + 
+#>     Prop_Visible_Minority + Prop_Indigenous_Pop + Prop_One_Parent_Families + 
+#>     Prop_Female, data = mutate(st_drop_geometry(toronto_das), 
+#>     Median_Income = Median_Income/10000))
+#> 
+#> Residuals:
+#>        Min         1Q     Median         3Q        Max 
+#> -6.747e-06 -1.488e-06  3.950e-08  1.494e-06  4.668e-06 
+#> 
+#> Coefficients:
+#>                            Estimate Std. Error t value Pr(>|t|)    
+#> (Intercept)              -1.851e-06  6.819e-07  -2.715 0.006660 ** 
+#> Median_Income             1.624e-07  3.427e-08   4.738 2.24e-06 ***
+#> Low_Income                8.619e-09  5.092e-09   1.693 0.090612 .  
+#> Average_Age              -2.888e-08  7.848e-09  -3.681 0.000236 ***
+#> Prop_Visible_Minority    -1.157e-05  1.242e-05  -0.932 0.351573    
+#> Prop_Indigenous_Pop       1.143e-05  1.243e-05   0.920 0.357777    
+#> Prop_One_Parent_Families  1.802e-07  5.537e-07   0.325 0.744898    
+#> Prop_Female               4.760e-06  1.146e-06   4.154 3.34e-05 ***
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> 
+#> Residual standard error: 2.003e-06 on 3652 degrees of freedom
+#>   (83 observations deleted due to missingness)
+#> Multiple R-squared:  0.01803,    Adjusted R-squared:  0.01615 
+#> F-statistic: 9.579 on 7 and 3652 DF,  p-value: 7.544e-12
+```
+
+``` r
+mod <- lm(dev_v ~ Median_Income + Low_Income + Average_Age + Prop_Female,
+   data = toronto_das |>
+     st_drop_geometry() |>
+     mutate(dev_v = dev_v/ep,
+            Median_Income = Median_Income/10000))
+
+summary(mod)
+#> 
+#> Call:
+#> lm(formula = dev_v ~ Median_Income + Low_Income + Average_Age + 
+#>     Prop_Female, data = mutate(st_drop_geometry(toronto_das), 
+#>     dev_v = dev_v/ep, Median_Income = Median_Income/10000))
+#> 
+#> Residuals:
+#>      Min       1Q   Median       3Q      Max 
+#> -1.08393 -0.23914  0.00548  0.23910  0.74983 
+#> 
+#> Coefficients:
+#>                 Estimate Std. Error t value Pr(>|t|)    
+#> (Intercept)   -0.3163076  0.0900462  -3.513 0.000449 ***
+#> Median_Income  0.0249514  0.0045171   5.524 3.55e-08 ***
+#> Low_Income     0.0013613  0.0008022   1.697 0.089795 .  
+#> Average_Age   -0.0047416  0.0011498  -4.124 3.81e-05 ***
+#> Prop_Female    0.7844405  0.1718706   4.564 5.18e-06 ***
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> 
+#> Residual standard error: 0.3218 on 3655 degrees of freedom
+#>   (83 observations deleted due to missingness)
+#> Multiple R-squared:  0.01772,    Adjusted R-squared:  0.01664 
+#> F-statistic: 16.48 on 4 and 3655 DF,  p-value: 2.163e-13
+```
